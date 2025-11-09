@@ -6,7 +6,7 @@ This is a MERN stack-based e-commerce application. The app allows users to brows
 
 Follow these instructions to clone the repository and set up the development environment.
 
-### Prerequisites
+### Pre-requisites
 
 - [Node.js](https://nodejs.org/) (v14 or above)
 - [MongoDB](https://www.mongodb.com/try/download/community)
