@@ -1,6 +1,6 @@
 # E-Commerce Application
 
-This is a MERN stack-based e-commerce application. The app allows users to browse products, manage their cart, view their wishlist, and perform other e-commerce functionalities.
+This is a MERN stack-based e-commerce application. The app allows users to browse products, manage their cart, view their wisshlist, and perform other e-commerce functionalities.
 
 ## Getting Started
 
