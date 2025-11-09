@@ -8,5 +8,5 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - ./Jenkins_E_Commerce_App:/app
+      - .:/app
       - /app/node_modules

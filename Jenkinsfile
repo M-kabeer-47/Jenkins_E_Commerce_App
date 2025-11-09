@@ -4,7 +4,6 @@ pipeline {
     environment {
         DOCKER_COMPOSE_FILE = 'docker-compose.yml'
         PROJECT_NAME = 'ecommerce-jenkins'
-        APP_DIR = 'Jenkins_E_Commerce_App'
     }
 
     stages {
@@ -14,29 +13,17 @@ pipeline {
                     echo 'Cleaning up previous containers...'
                     sh '''
                         docker-compose down -v || true
-                        rm -rf ${APP_DIR} || true
                     '''
                 }
             }
         }
 
-        stage('Checkout Application') {
-            steps {
-                script {
-                    echo 'Fetching application code from GitHub...'
-                    sh '''
-                        git clone https://github.com/M-kabeer-47/Jenkins_E_Commerce_App ${APP_DIR}
-                    '''
-                }
-            }
-        }
-        
         stage('Deploy') {
             steps {
                 script {
                     echo 'Starting containerized application...'
                     sh '''
-                        docker-compose up -d
+                        docker-compose up -d --build
                     '''
                 }
             }
