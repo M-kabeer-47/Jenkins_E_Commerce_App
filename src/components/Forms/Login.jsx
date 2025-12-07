@@ -3,38 +3,38 @@ import { IoMdAlert } from "react-icons/io";
 import './login.css';
 import { MdOutlineEmail } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
-
+import { useNavigate } from "react-router-dom";
 import { FaGoogle } from "react-icons/fa";
 import z from "zod"
 
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import {useForm} from "react-hook-form"
-import {zodResolver} from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 axios.defaults.withCredentials = true;
 export default function Login() {
+
   const backendUrl = useSelector((state) => state.user.backendUrl);
   const [passwordVisible, setPasswordVisible] = useState(false);
-  
-  
+
+
   const [showPopup, setShowPopup] = useState(false);
-  
-const [isEmailFocused, setIsEmailFocused] = useState(false);
-const [isPasswordFocused, setIsPasswordFocused] = useState(false);  
-const [submitting,setSubmitting] = useState(false);
-const [platform,setPlatform] = useState("");
+
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [platform, setPlatform] = useState("");
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
   const userSchema = z.object({
-    email: z.string().min(1,{message: "Email is required" }).email({message: "Invalid email"}),
-    password: z.string().min(1,{message:"Password is required"}).min(8,{message: "Password must be 8 characters long"})
+    email: z.string().min(1, { message: "Email is required" }).email({ message: "Invalid email" }),
+    password: z.string().min(1, { message: "Password is required" }).min(8, { message: "Password must be 8 characters long" })
   })
-const {register,handleSubmit,formState: {errors},setError} = useForm({
-  resolver: zodResolver(userSchema)
-})
- 
+  const { register, handleSubmit, formState: { errors }, setError } = useForm({
+    resolver: zodResolver(userSchema)
+  })
+
 
   const eyeSvgClosed = (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20">
@@ -51,65 +51,65 @@ const {register,handleSubmit,formState: {errors},setError} = useForm({
   );
 
   const onSubmit = async (data) => {
-    
-    const {email,password} = data;
+
+    const { email, password } = data;
     let Email = email.toLowerCase();
-    
-    
-    try{
 
-    setSubmitting(true);
-    let response = await axios.post(`${backendUrl}/login`,{ email: Email, password: password })
-    
-   
-  if(response.data.data === "Google"){
-    
-setSubmitting(false);
-    setPlatform("google");
-  return;
-}
-   
-    else if(response.data.data === "Success"){
-      
-      setSubmitting(false);
-      localStorage.setItem("uid",response.data.token);
-      localStorage.setItem("tokenExpiry",response.data.maxAge);
-      window.location.href = "http://localhost:5174"; 
-       
+
+    try {
+
+      setSubmitting(true);
+      let response = await axios.post(`${backendUrl}/login`, { email: Email, password: password })
+
+
+      if (response.data.data === "Google") {
+
+        setSubmitting(false);
+        setPlatform("google");
+        return;
+      }
+
+      else if (response.data.data === "Success") {
+        navigate("/");
+        setSubmitting(false);
+        localStorage.setItem("uid", response.data.token);
+        localStorage.setItem("tokenExpiry", response.data.maxAge);
+
+
+      }
+    }
+    catch (error) {
+      if (error.response.data === "User Does Not Exist") {
+        setSubmitting(false);
+
+        setError("email", { type: "manual", message: "User doesn't exist" })
+
+        return;
+      }
+      else if (error.response.data === "Incorrect Password") {
+
+        setSubmitting(false);
+        setError("password", { type: "manual", message: "Incorrect Password" })
+        return
+      }
+    }
+
   }
-}
-catch(error){
-  if(error.response.data === "User Does Not Exist"){
-    setSubmitting(false);
-    
-    setError("email",{type:"manual",message: "User doesn't exist"})
-    
-    return;
-}
- else if(error.response.data === "Incorrect Password"){
-    
-    setSubmitting(false);
-    setError("password",{type:"manual",message:"Incorrect Password"})
-    return
-} 
-}
-
-}
-const navigate = useNavigate();
+  const navigate = useNavigate();
   return (
     <div className="body">
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <h2 className="login-title">Glitchware</h2>
         <p className="signin">Login</p>
-        
+
         <div className="inputs">
-          <div className="input-container email" onFocus={()=>{
+          <div className="input-container email" onFocus={() => {
             setIsEmailFocused(true);
-          }} onBlur={()=>{
+          }} onBlur={() => {
             setIsEmailFocused(false);
-          }} style={isEmailFocused ? {border:"2px solid  #00A7FF",transition:"0.3s ease all"}:{}}>
+          }} style={isEmailFocused ? { border: "2px solid  #00A7FF", transition: "0.3s ease all" } : {}}>
             <label htmlFor="input" className='input-label'>Email</label>
-            <MdOutlineEmail style={!isEmailFocused ? {position:"absolute",top:"10px",left:"10px",fontSize:"19px",color:"white"}:{position:"absolute",top:"10px",left:"10px",fontSize:"19px",color:"#007bff"}} />
+            <MdOutlineEmail style={!isEmailFocused ? { position: "absolute", top: "10px", left: "10px", fontSize: "19px", color: "white" } : { position: "absolute", top: "10px", left: "10px", fontSize: "19px", color: "#007bff" }} />
             <input
               id="email"
               placeholder=" "
@@ -118,21 +118,22 @@ const navigate = useNavigate();
               name="email"
               autoComplete="off"
               {...register("email")}
-              
+
             />
-            {(errors.email && platform!="google") && <p style={{color: "red",fontSize: "10px", position: "absolute",left:"0px",top:"44px",fontWeight:"normal"}}>{errors.email.message}</p>}
-            
-            {(errors.email && platform  === "google") && <p style={{color: "red",fontSize: "10px", position: "absolute",left:"0px",top:"44px",fontWeight:"normal"}}>This email is already associated with a Google account</p>}
+            {(errors.email && platform != "google") && <p style={{ color: "red", fontSize: "10px", position: "absolute", left: "0px", top: "44px", fontWeight: "normal" }}>{errors.email.message}</p>}
+
+            {(errors.email && platform === "google") && <p style={{ color: "red", fontSize: "10px", position: "absolute", left: "0px", top: "44px", fontWeight: "normal" }}>This email is already associated with a Google account</p>}
 
           </div>
-          <div className="input-container password" onFocus={()=>{
-          setIsPasswordFocused(true);
-          }} onBlur={()=>{
-          setIsPasswordFocused(false)}} style={isPasswordFocused ? {border:"2px solid  #00A7FF",transition:"0.3s ease all"}:{}}>
-          <label htmlFor="password" className='input-label'>
+          <div className="input-container password" onFocus={() => {
+            setIsPasswordFocused(true);
+          }} onBlur={() => {
+            setIsPasswordFocused(false)
+          }} style={isPasswordFocused ? { border: "2px solid  #00A7FF", transition: "0.3s ease all" } : {}}>
+            <label htmlFor="password" className='input-label'>
               Password
             </label>
-            <RiLockPasswordLine style={!isPasswordFocused ? {position:"absolute",top:"10px",left:"10px",fontSize:"19px",color:"white"}:{position:"absolute",top:"10px",left:"10px",fontSize:"19px",color:"#007bff"}} />
+            <RiLockPasswordLine style={!isPasswordFocused ? { position: "absolute", top: "10px", left: "10px", fontSize: "19px", color: "white" } : { position: "absolute", top: "10px", left: "10px", fontSize: "19px", color: "#007bff" }} />
             <input
               id="password"
               placeholder=" "
@@ -141,10 +142,10 @@ const navigate = useNavigate();
               name="password"
               autoComplete="new-password"
               {...register("password")}
-              
+
             />
-            {(errors.password && platform!="google") && <p style={{color: "red",fontSize: "10px", position: "absolute",left:"0px",top:"44px",fontWeight:"normal"}}>{errors.password.message}</p>}
-            
+            {(errors.password && platform != "google") && <p style={{ color: "red", fontSize: "10px", position: "absolute", left: "0px", top: "44px", fontWeight: "normal" }}>{errors.password.message}</p>}
+
             <div
               onClick={togglePasswordVisibility}
               style={{ position: 'absolute', right: '10px', top: '10px', cursor: 'pointer' }}
@@ -153,29 +154,29 @@ const navigate = useNavigate();
             </div>
           </div>
         </div>
-        <p className='sign-up-option'>Don't have an account?<span className='sign-up-link' onClick={()=>{
-          
+        <p className='sign-up-option'>Don't have an account?<span className='sign-up-link' onClick={() => {
+
           navigate('/register');
         }}>Sign up</span></p>
         <button type="submit" className='login-button'>{submitting ? "Logging in..." : "Login"}</button>
-        <h4 style={{color:"white",fontWeight:"normal"}}>or</h4>
-        <button  className='login-button google-button' onClick={()=>{
+        <h4 style={{ color: "white", fontWeight: "normal" }}>or</h4>
+        <button className='login-button google-button' onClick={() => {
           event.preventDefault();
-          window.location.href = "https://e-commerce-website-phi-vert.vercel.app/auth/google"; 
-          
+          window.location.href = "https://e-commerce-website-phi-vert.vercel.app/auth/google";
 
 
 
-          
+
+
 
         }}>
-          <FaGoogle style={{fontSize:"20px",marginRight:"10px"}} />
+          <FaGoogle style={{ fontSize: "20px", marginRight: "10px" }} />
           Sign in with google</button>
       </form>
       {showPopup && (
         <div className="popup">
           <IoMdAlert
-          className='alert' />
+            className='alert' />
           <p>User not found</p>
         </div>
       )}
