@@ -159,7 +159,7 @@ pipeline {
 
         success {
             echo 'Pipeline completed successfully!'
-            echo 'Frontend: http://your-ec2-ip:3001'
+            echo 'Frontend: http://ec2-3-110-124-116.ap-south-1.compute.amazonaws.com:3001'
         }
 
         failure {
